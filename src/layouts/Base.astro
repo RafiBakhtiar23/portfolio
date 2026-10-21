@@ -106,7 +106,7 @@ const beacon = site.analyticsToken ? JSON.stringify({ token: site.analyticsToken
             <a href={hrefFor(l.code)} hreflang={l.code} lang={l.code} aria-current={l.code === lang ? 'true' : undefined} class={l.code === lang ? 'on' : ''}>{l.label}</a>
           ))}
         </div>
-        {cv.exists && <a class="button button-gold button-sm" href={cv.url} download data-magnetic>{t.cv} <span>↓</span></a>}
+        {cv.exists && <a class="button button-gold button-sm" href={lang === 'id' ? '/id/cv/' : '/cv/'} data-magnetic>{t.cv} <span>↗</span></a>}
         <button type="button" class="menu-btn" id="menu-btn" aria-controls="site-menu" aria-expanded="false" aria-label={t.menu} data-open={t.menu} data-close={t.menuClose}><span></span><span></span></button>
       </div>
     </header>
