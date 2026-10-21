@@ -1,0 +1,10 @@
+/* TEAM */
+Name: Rafi Bakhtiar Cahyadi
+Role: Software Engineer
+Location: Bandung, Indonesia
+GitHub: https://github.com/RafiBakhtiar23
+
+/* SITE */
+Built with: Astro, plain CSS, plain JavaScript
+Fonts: Playfair Display, DM Sans, DM Mono
+Languages: English, Indonesian

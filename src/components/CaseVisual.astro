@@ -1,0 +1,34 @@
+---
+// Ilustrasi proyek. Untuk Task API: tampilkan rute asli dari daftar endpoints (tanpa /health);
+// kalau daftarnya kosong, tampilkan alur fitur tanpa menebak path.
+const { slug, endpoints = [] } = Astro.props;
+const routes = endpoints.filter((e) => e.path !== '/health').slice(0, 5);
+const sample = `{
+  "data": [],
+  "meta": { "page": 1, "limit": 10, "total": 0 }
+}`;
+---
+<div class={`case-hero-visual ${slug}`}>
+  {slug === 'attenda' && (
+    <div class="case-window"><div class="window-top"><i></i><i></i><i></i><span>attenda / overview</span></div><div class="case-dashboard"><aside><b>ATTENDA</b><span>Overview</span><span>Employees</span><span>Attendance</span><span>Settings</span></aside><div class="case-dash-main"><p>Overview</p><div class="case-stat-grid"><div><small>EMPLOYEES</small><b>Team overview</b></div><div><small>ATTENDANCE</small><b>Daily records</b></div><div><small>MANAGEMENT</small><b>Account status</b></div></div><div class="case-table"><span>EMPLOYEE</span><span>DATE</span><span>STATUS</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+  )}
+  {slug === 'task-api' && (
+    <div class="api-code">
+      <div class="api-code-top"><span>task-api / routes</span><span>GO · GIN · GORM</span></div>
+      {routes.length > 0
+        ? routes.map((r, i) => <p><i>{String(i + 1).padStart(2, '0')}</i> <b>{r.method}</b> {r.path}</p>)
+        : (
+          <Fragment>
+            <p><i>01</i> <b>AUTH</b> register · login</p>
+            <p><i>02</i> <strong>PROFILE</strong> me</p>
+            <p><i>03</i> <b>TASKS</b> create · read · update · delete</p>
+            <p><i>04</i> <strong>LISTING</strong> paginated results</p>
+          </Fragment>
+        )}
+      <div class="api-response"><span>RESPONSE · JSON (EMPTY LIST)</span><pre>{sample}</pre></div>
+    </div>
+  )}
+  {slug === 'pancake' && (
+    <div class="shop-case"><div class="shop-case-label">FRESHLY MADE · SMALL BATCH</div><div class="shop-case-title">A little<br /><em>something sweet.</em></div><div class="shop-case-product"></div><div class="shop-case-foot">PANCAKE ROLL / MENU ↗</div></div>
+  )}
+</div>

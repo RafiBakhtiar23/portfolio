@@ -1,0 +1,163 @@
+/* v8 to v12 polish. Loaded last. Every block below is independent: delete one block to undo just that change.
+   v8   readable small text, keyboard focus under the hiding top bar, 404 page
+   v10  desktop and mobile details (touch targets, long words, overscroll colour, wide screens)
+   v11  accessibility (reduce-effects switch, contrast, forced colours, high contrast)
+   v12  performance (lighter effects on touch devices) */
+
+/* ---------- 1) readable small text ---------- */
+.eyebrow, .section-kicker, .work-count, .project-art-label, .project-art-footer, .project-index,
+.contact-links, .case-back, .case-meta span, .case-feature-grid article > span, .wordmark small { font-size: 10.5px; }
+.button, .text-link, .case-bottom .text-link { font-size: 11px; }
+.button-sm { font-size: 10px; }
+.rail a { font-size: 10px; }
+.cursor-ring span { font-size: 9px; }
+.hero-bottom { font-size: 10.5px; }
+
+@media (min-width: 1280px) {
+  .topbar nav a, .availability { font-size: 10.5px; }
+}
+@media (max-width: 700px) {
+  .hero-bottom, .work-count { font-size: 10px; }
+}
+
+/* ---------- 2) keyboard focus never disappears under a hidden bar ---------- */
+.topbar.hide:focus-within { transform: none; }
+.topbar a:focus-visible, .topbar button:focus-visible { outline-offset: 3px; }
+
+/* ---------- 3) 404 ---------- */
+.notfound { min-height: calc(100svh - 88px - 90px); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-top: 72px; padding-bottom: 72px; }
+.notfound h1 { font: 500 clamp(52px, 11vw, 112px)/.98 var(--serif); letter-spacing: -.05em; margin: 22px 0 24px; }
+.notfound h1 em { font-size: 1em; }
+.notfound p { color: #a49f96; font-size: 14px; line-height: 1.8; margin: 0 0 6px; max-width: 46ch; }
+.notfound-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+
+/* =====================================================================
+   v10. Desktop and mobile
+   ===================================================================== */
+
+/* No white flash when the page is pulled past its edge on iPhone and Android. */
+html { background: #090909; }
+
+/* Long words (for example Indonesian headings) wrap instead of pushing the page sideways. */
+body { overflow-wrap: break-word; }
+.chip b, .cert-main h3, .project-description h3 { overflow-wrap: anywhere; }
+
+/* Finger-sized targets: every small link and button is at least 44px tall on touch screens. */
+@media (pointer: coarse) {
+  .lang-switch a, .copy-btn, .contact-links a, .snapshot-links a, .project-links a, .case-back,
+  .fx-toggle, .lang-hint a, .lang-hint button { display: inline-flex; align-items: center; min-height: 44px; }
+}
+
+/* Very wide screens: the top bar and footer line up with the page content instead of the screen edge. */
+@media (min-width: 1500px) {
+  .topbar, .footer {
+    padding-left: max(10%, calc((100% - 1200px) / 2));
+    padding-right: max(10%, calc((100% - 1200px) / 2));
+  }
+}
+
+/* The language banner never touches the screen edge or the home bar. */
+@media (max-width: 700px) {
+  .lang-hint { max-width: calc(100vw - 24px); bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+
+/* =====================================================================
+   v11. Accessibility
+   ===================================================================== */
+
+/* Footer switch: turns off animation, the custom cursor and the gold canvas (remembered on this device). */
+.fx-toggle {
+  font: 10.5px var(--mono);
+  letter-spacing: .1em;
+  color: #8d8981;
+  background: transparent;
+  border: 1px solid #4a3f2b;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: color .25s, border-color .25s;
+}
+.fx-toggle:hover { color: var(--gold-bright); border-color: var(--gold); }
+.fx-toggle[aria-pressed='true'] { color: var(--gold-bright); border-color: var(--gold); }
+.fx-toggle[aria-pressed='true']::before { content: '\2713\00a0'; }
+/* Visitors whose system already asks for reduced motion do not need the switch. */
+@media (prefers-reduced-motion: reduce) { .fx-toggle { display: none; } }
+
+/* Effects off: everything still (the script side is handled in util.js, ribbon.js and the head script). */
+.fx-off, .fx-off * { scroll-behavior: auto !important; }
+.fx-off *, .fx-off *::before, .fx-off *::after { animation: none !important; transition: none !important; }
+.fx-off .grain, .fx-off .spot { display: none; }
+.fx-off .scroll-mark::after { transform: translateY(8px); }
+
+/* Targets of the skip link and anchors take focus without a big box around the whole section. */
+[tabindex='-1']:focus { outline: none; }
+
+/* Contrast: text that was below 4.5 : 1 against the page background. */
+.loader-skip { color: #8a8478; }
+.project-art-label span { color: #9a9488; }
+.motion-on .w { color: #807a6e; }
+
+/* Windows high-contrast mode: keep borders and the active link visible, hide pure decoration. */
+@media (forced-colors: active) {
+  .grain, .spot, .hero-bg, .status-big { display: none; }
+  .button, .menu-btn, .copy-btn, .fx-toggle { border: 1px solid ButtonText; }
+  .topbar nav a.active { text-decoration: underline; }
+  .chip { border: 1px solid CanvasText; }
+  .chip.is-basic { border-style: dashed; }
+}
+
+/* "Increase contrast" setting (macOS, iOS, Android): brighter secondary text and stronger lines. */
+@media (prefers-contrast: more) {
+  :root { --muted: #b8b3a9; --line: rgba(232, 219, 194, .4); }
+  .grain, .spot { display: none; }
+  .eyebrow, .section-kicker, .project-index, .work-count, .hero-bottom, .footer, .footer span,
+  .lang-switch a, .snapshot-grid dt, .facts dt { color: #cfc8ba; }
+}
+
+/* =====================================================================
+   v12. Performance
+   ===================================================================== */
+
+/* The film-grain layer covers the whole screen. On phones and tablets it is barely visible but costs GPU time. */
+@media (hover: none) and (pointer: coarse) { .grain { display: none; } }
+
+/* ---------- v14: halaman /cv ---------- */
+.cvpage { padding-top: clamp(72px, 10vw, 120px); padding-bottom: clamp(56px, 8vw, 96px); }
+.cvpage h1 { font: 500 clamp(44px, 8vw, 92px)/1 var(--serif); letter-spacing: -.045em; margin: 22px 0 22px; }
+.cvpage-lead { max-width: 58ch; margin: 0 0 6px; color: #a49f96; font-size: 14px; line-height: 1.8; }
+.cvpage-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 28px 0 40px; }
+.cvpage-frame { display: block; width: 100%; height: min(86svh, 1100px); border: 1px solid #3a352a; background: #0b0b0a; }
+/* PDF viewers inside an iframe are poor on phones and tablets: show the buttons only. */
+@media (max-width: 820px), (pointer: coarse) { .cvpage-frame { display: none; } }
+
+/* ---------- v14b: perbaikan tampilan ---------- */
+/* Teks besar "200 OK" di Contact tidak boleh tertimpa navigasi titik di sisi kanan. */
+@media (min-width: 1000px) { .contact > .status-big { right: 130px; } }
+/* Nomor proyek ("01 / 03") tidak boleh terpecah dua baris. */
+.project-index { white-space: nowrap; }
+/* Judul tidak menyisakan satu kata sendirian di baris terakhir. */
+h1, h2 { text-wrap: balance; }
+
+/* ---------- v15: foto sampul kartu proyek ---------- */
+/* Screenshot asli ditaruh di dalam bingkai jendela emas yang sama dengan ilustrasi bawaan.
+   Filter dan lapisan emas menyamakan warnanya dengan tema, jadi warna aplikasi tidak bentrok. */
+.visual-window.has-shot { position: relative; display: flex; flex-direction: column; }
+.visual-window.has-shot .shot-cover {
+  display: block; flex: none; width: 100%; height: auto;
+  filter: saturate(.76) contrast(1.04) brightness(.86);
+}
+/* Screenshot tampil selebar bingkai (tidak pernah terpotong ke samping); bagian bawah yang melebihi bingkai terpotong. */
+.visual-window.has-shot::after {
+  content: ''; position: absolute; inset: 24px 0 0 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(198, 168, 117, .10), rgba(198, 168, 117, 0) 40%, rgba(9, 9, 9, .55));
+  mix-blend-mode: normal;
+}
+@media (forced-colors: active) { .visual-window.has-shot::after { display: none; } }
+
+/* ---------- v15b: galeri screenshot selalu rapi, apa pun ukuran gambarnya ---------- */
+/* Semua screenshot tampil di bingkai 16:9 yang sama dan tidak pernah terpotong ke samping.
+   Gambar lebar atau tegak ditampilkan utuh (ada pinggiran gelap bila rasionya berbeda);
+   hanya gambar yang hampir persegi dipotong dari bawah. Klik gambar untuk membuka ukuran penuh. */
+.shot-grid figure a { display: block; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid #3a352a; background: #0b0b0a; }
+.shot-grid figure a img { width: 100%; height: 100%; object-fit: cover; object-position: top center; border: 0; }
+.shot-grid figure.is-wide a img, .shot-grid figure.is-portrait a img { object-fit: contain; object-position: center; }
+.shot-grid figure a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }

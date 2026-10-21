@@ -1,0 +1,113 @@
+/* Top bar (v7). Loaded last. Desktop: refined links + gold hairline.
+   Up to 1000px wide: the links become a full-screen menu opened by the two-line button. */
+
+:root { --bar-h: 88px; }
+@media (max-width: 700px) { :root { --bar-h: 72px; } }
+
+/* ---------- desktop ---------- */
+.topbar { border-bottom: 0; background: rgba(9, 9, 9, .94); }
+.topbar::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(198, 168, 117, .42) 18%, rgba(198, 168, 117, .42) 82%, transparent);
+}
+.topbar > * { position: relative; z-index: 2; }
+.topbar nav { gap: clamp(22px, 2.6vw, 38px); overflow: visible; }
+.topbar nav a { letter-spacing: .14em; }
+.topbar nav a.active { color: var(--gold-bright); }
+.menu-btn, .menu-cv, .menu-mail { display: none; }
+
+/* ---------- menu button (two thin gold lines that cross into an X) ---------- */
+.menu-btn {
+  width: 44px; height: 44px;
+  padding: 0;
+  border: 1px solid rgba(198, 168, 117, .38);
+  background: transparent;
+  cursor: pointer;
+  flex: none;
+  position: relative;
+}
+.menu-btn span {
+  position: absolute;
+  left: 13px; right: 13px;
+  height: 1px;
+  background: var(--gold-bright);
+  transition: transform .45s var(--ease), top .45s var(--ease);
+}
+.menu-btn span:first-child { top: 18px; }
+.menu-btn span:last-child { top: 25px; }
+.menu-open .menu-btn span:first-child { top: 21.5px; transform: rotate(45deg); }
+.menu-open .menu-btn span:last-child { top: 21.5px; transform: rotate(-45deg); }
+.menu-btn:hover { border-color: var(--gold); }
+
+/* ---------- tablet & phone: full-screen menu ---------- */
+@media (max-width: 1000px) {
+  .menu-btn { display: block; }
+  .topbar-right { gap: 14px; }
+  .topbar .availability { display: none; }
+
+  .topbar nav {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: calc(var(--bar-h) + 20px) 6% max(28px, env(safe-area-inset-bottom));
+    background:
+      radial-gradient(ellipse 70% 50% at 85% 100%, rgba(198, 168, 117, .14), transparent 70%),
+      #090909;
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .4s var(--ease), visibility 0s linear .4s;
+  }
+  .menu-open .topbar nav { visibility: visible; opacity: 1; transition: opacity .4s var(--ease), visibility 0s; }
+  .menu-open { overflow: hidden; }
+  .menu-open .topbar { transform: none !important; }
+
+  .topbar nav a:not(.menu-cv):not(.menu-mail) {
+    display: block;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    font: 500 clamp(34px, 9vw, 60px)/1.1 var(--serif);
+    letter-spacing: -.04em;
+    text-transform: lowercase;
+    color: var(--cream);
+  }
+  .topbar nav a:not(.menu-cv):not(.menu-mail)::first-letter { text-transform: uppercase; }
+  .topbar nav a:not(.menu-cv):not(.menu-mail)::after { display: none; }
+  .topbar nav a.active:not(.menu-cv):not(.menu-mail) { color: var(--gold-bright); }
+  .topbar nav a.active:not(.menu-cv):not(.menu-mail)::before {
+    content: '';
+    position: absolute;
+    right: 4px; top: 50%;
+    width: 8px; height: 8px;
+    margin-top: -4px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+  .topbar nav a:not(.menu-cv):not(.menu-mail):hover { color: var(--gold-bright); }
+
+  .topbar nav .menu-cv { color: #11100d; }
+  .menu-cv { display: inline-flex; margin-top: 36px; align-self: stretch; min-height: 54px; }
+  .menu-mail { margin-top: 20px; }
+  .menu-mail { display: block; font: 12px var(--mono); letter-spacing: .08em; color: var(--muted); text-align: center; overflow-wrap: anywhere; }
+
+  /* links rise in one after another when the menu opens */
+  .topbar nav a { opacity: 0; transform: translateY(14px); transition: opacity .5s var(--ease), transform .6s var(--ease), color .3s; }
+  .menu-open .topbar nav a { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 60ms + 120ms), calc(var(--i, 0) * 60ms + 120ms), 0s; }
+}
+
+@media (max-width: 700px) {
+  .topbar-right { gap: 10px; }
+  .topbar .lang-switch a { padding: 10px 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar nav a, .menu-btn span { transition: none !important; }
+  .topbar nav a { opacity: 1; transform: none; }
+}

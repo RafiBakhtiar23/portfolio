@@ -1,0 +1,20 @@
+---
+import { webpSize } from '../lib/files.js';
+const { slug, cover } = Astro.props;
+const size = cover ? webpSize(cover) : null;
+const labels = { attenda: 'attenda / overview', 'task-api': 'task-api / endpoints', pancake: 'pancake roll / shop' };
+const label = labels[slug] ?? slug;
+---
+<div class={`visual-window${cover ? ' has-shot' : ''}`}>
+  <div class="window-top"><i></i><i></i><i></i><span>{label}</span></div>
+  {cover && <img class="shot-cover" src={cover} alt="" width={size?.width ?? 1600} height={size?.height ?? 900} loading="lazy" decoding="async" />}
+  {!cover && slug === 'attenda' && (
+    <div class="dash-mock"><div class="dash-rail"></div><div class="dash-main"><div class="dash-title"></div><div class="dash-stats"><b></b><b></b><b></b></div><div class="dash-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+  )}
+  {!cover && slug === 'task-api' && (
+    <div class="code-mock"><span>01&nbsp; <b>AUTH</b> register · login</span><span>02&nbsp; <b>TASKS</b> create · read · update · delete</span><span>03&nbsp; <em>PAGINATED</em> lists</span><span>04&nbsp; <i>// Go · Gin · GORM</i></span></div>
+  )}
+  {!cover && slug === 'pancake' && (
+    <div class="shop-mock"><div class="shop-product"></div><div><small>FRESH FROM THE OVEN</small><b>Something<br />sweet.</b><span>DISCOVER THE MENU ↗</span></div></div>
+  )}
+</div>

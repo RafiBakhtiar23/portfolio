@@ -1,0 +1,45 @@
+/* v6 performance layer. Loaded last so it can replace expensive rules without touching the design. */
+
+/* 1) Hero sculpture floats with transform (GPU), not margin-top (layout every frame). */
+.sculpture { filter: none; transition: none; will-change: transform; animation: sculpture-bob 7s ease-in-out infinite; }
+@keyframes sculpture-bob {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 9px)); }
+}
+.sculpture-core, .sculpture-ring { will-change: transform; }
+/* same depth as the old drop-shadow / blur, but painted once instead of re-filtered while moving */
+.sculpture-core { box-shadow: inset 8px 0 15px #f7dba044, inset -12px 0 20px #090909aa, 10px 28px 36px -14px #000a; }
+.sculpture-shadow { filter: none; background: radial-gradient(ellipse at center, #000 0, #000c 38%, transparent 72%); }
+
+/* 2) Sticky menu: solid, no backdrop blur (blur is re-computed on every scroll frame). */
+.topbar { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(9, 9, 9, .96); }
+
+/* 3) Pointer glow: a small element moved with transform instead of repainting a full-screen gradient. */
+.spot { inset: auto; left: 0; top: 0; width: 1040px; height: 1040px; margin: -520px 0 0 -520px; opacity: 0; transition: opacity .4s; will-change: transform;
+  background: radial-gradient(circle closest-side, rgba(198, 168, 117, .065), transparent 100%); }
+.has-cursor .spot { opacity: 1; }
+
+/* 4) Looping animations stop when off-screen or when the tab is in the background. */
+.off, .off *, .tab-hidden * { animation-play-state: paused !important; }
+
+/* 5) Permanent 3D layers only while hovered. */
+.project-art { will-change: auto; }
+.project-art:hover { will-change: transform; }
+
+/* 6) Lighter decoration on touch screens and low-end / data-saver devices. */
+@media (pointer: coarse), (max-width: 700px) { .grain, .spot { display: none; } }
+.lite .grain, .lite .spot, .lite .hero-art::after { display: none; }
+.lite .orbit-one, .lite .orbit-two, .lite .visual-window { animation: none; }
+
+/* 7) Smooth anchor scrolling only for people who did not ask for less motion. */
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.certs-all{display:inline-block;margin-top:28px}
+
+/* Hero visual: flowing gold lines (public/hero-lines.webp) instead of the sculpture. */
+.hero-art { background: url('/hero-lines.webp') center / cover no-repeat, #0c0c0b; }
+.hero-art .sculpture { display: none; }
+@media (max-width: 700px) { .hero-art { min-height: 340px; background-position: 60% center; } }
+
+/* Live ribbon (src/scripts/ribbon.js) replaces the static image while it runs. */
+.hero-art .ribbon { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.hero-art.ribbon-live { background: #0c0c0b !important; }

@@ -1,0 +1,60 @@
+/* Case-study extras (v13): the API Explorer (recorded requests) and the demo video.
+   Loaded before polish.css. Delete the import in Base.astro to remove both. */
+
+.xp-note { margin: 0 0 22px; max-width: 62ch; font-size: 13px; line-height: 1.8; color: #a49f96; }
+.xp-list { border-top: 1px solid rgba(198, 168, 117, .45); }
+.xp { border-bottom: 1px solid var(--line); }
+.xp summary {
+  display: grid;
+  grid-template-columns: 28px auto minmax(0, 1fr) auto;
+  grid-template-areas: "n method path status" ". title title title";
+  align-items: center;
+  gap: 6px 14px;
+  padding: 16px 4px;
+  cursor: pointer;
+  list-style: none;
+  transition: background .3s;
+}
+.xp summary::-webkit-details-marker { display: none; }
+.xp summary:hover { background: rgba(198, 168, 117, .05); }
+.xp-n { grid-area: n; font: 10.5px var(--mono); letter-spacing: .1em; color: #8d8981; }
+.xp .method { grid-area: method; justify-self: start; }
+.xp-path { grid-area: path; min-width: 0; font: 13px var(--mono); color: var(--cream); overflow-wrap: anywhere; }
+.xp-status { grid-area: status; justify-self: end; font: 500 10.5px var(--mono); letter-spacing: .06em; padding: 4px 8px; border: 1px solid #4a4333; color: #d6b16c; }
+.xp-status.s-2xx { color: #9fd1a0; border-color: #3f5a41; }
+.xp-status.s-4xx, .xp-status.s-5xx { color: #e0a58c; border-color: #6a4636; }
+.xp-title { grid-area: title; font-size: 13px; color: #a8a196; line-height: 1.6; }
+.xp[open] summary { background: rgba(198, 168, 117, .06); }
+
+.xp-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 4px 4px 22px; }
+.xp-pane { min-width: 0; display: flex; flex-direction: column; }
+.xp-pane h4 { margin: 0 0 8px; font: 500 10.5px var(--mono); letter-spacing: .12em; color: var(--gold); }
+.xp-pane pre {
+  margin: 0;
+  padding: 16px;
+  flex: 1;
+  overflow-x: auto;
+  background: #0b0b0a;
+  border: 1px solid #2f2b22;
+  font: 12px/1.7 var(--mono);
+  color: #cfc8ba;
+  tab-size: 2;
+}
+.j-key { color: #e3c894; }
+.j-str { color: #b9cfa3; }
+.j-num { color: #e0a58c; }
+.j-lit { color: #d6b16c; }
+
+@media (max-width: 760px) {
+  .xp summary { grid-template-columns: 24px auto minmax(0, 1fr) auto; gap: 6px 10px; }
+  .xp-body { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- demo recording ---------- */
+.case-video { margin: 0 0 clamp(44px, 6vw, 80px); }
+.case-video video { display: block; width: 100%; height: auto; max-height: 78svh; background: #0b0b0a; border: 1px solid #3a352a; }
+.case-video figcaption { margin-top: 12px; font: 10.5px var(--mono); letter-spacing: .08em; color: #8d8981; }
+
+@media (prefers-contrast: more) {
+  .xp-pane pre { border-color: #8d8981; }
+}

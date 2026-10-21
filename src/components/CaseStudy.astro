@@ -1,0 +1,197 @@
+---
+import Base from '../layouts/Base.astro';
+import CaseVisual from './CaseVisual.astro';
+import { projects, ui, site } from '../data/site.js';
+import { langHome, langPrefix } from '../lib/i18n.js';
+import { hasPublic, readPublicJson, webpSize } from '../lib/files.js';
+import { renderExplorer } from '../lib/explorer.js';
+
+const { lang = 'en', slug } = Astro.props;
+const t = ui[lang];
+const cs = t.case.sections;
+const pre = langPrefix(lang);
+const home = langHome(lang);
+const index = projects.findIndex((p) => p.slug === slug);
+const project = projects[index];
+const next = projects[(index + 1) % projects.length];
+const c = project.t[lang];
+const no = String(index + 1).padStart(2, '0');
+const demoHost = project.demo ? project.demo.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+const demoNote = project.demoNote ? project.demoNote[lang] : '';
+const hasLinks = Boolean(project.demo || project.github);
+const screenshots = (project.screenshots ?? []).filter((s) => hasPublic(s.src));
+const erd = project.erd && hasPublic(project.erd.src) ? project.erd : null;
+// Accessibility guard: a screenshot or ERD without alt text in the current language fails the build.
+for (const img of [...screenshots, ...(erd ? [erd] : [])]) {
+  if (!img.alt || !img.alt[lang]) throw new Error(`Missing alt text (${lang}) for an image in project "${project.slug}". Add alt: { en, id } in site.js.`);
+}
+const explorerData = readPublicJson(`/projects/${project.slug}-explorer.json`);
+const explorerHtml = renderExplorer(explorerData, lang, { request: cs.explorer.request, response: cs.explorer.response });
+const explorerCount = Array.isArray(explorerData?.steps) ? explorerData.steps.length : 0;
+const explorerDate = explorerData?.capturedAt
+  ? new Intl.DateTimeFormat(lang === 'id' ? 'id-ID' : 'en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(explorerData.capturedAt))
+  : '';
+const video = project.video && hasPublic(project.video.src) ? project.video : null;
+const videoMime = video ? (video.src.endsWith('.webm') ? 'video/webm' : 'video/mp4') : '';
+const endpoints = project.endpoints ?? [];
+const decisions = project.decisions ?? [];
+const url = (p) => new URL(p, site.domain).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: site.name, item: url(home) },
+    { '@type': 'ListItem', position: 2, name: project.title, item: url(`${pre}/projects/${project.slug}/`) },
+  ],
+};
+---
+<Base title={`${project.title}: ${t.case.caseStudy} | ${site.name}`} description={c.lead} lang={lang} jsonLd={jsonLd}>
+  <main class="case-page section-shell" id="main" tabindex="-1">
+    <a class="case-back" href={`${home}#work`}>{t.case.back}</a>
+    <p class="eyebrow"><span class="eyebrow-line"></span> {t.case.project} {no} · {c.kicker}</p>
+    <h1 class="case-title">{c.caseTitle.main}<br /><em>{c.caseTitle.accent}</em></h1>
+    <p class={`case-lead${hasLinks ? ' has-links' : ''}`}>{c.lead}</p>
+
+    {hasLinks && (
+      <div class="case-links">
+        {project.demo && <a class="button button-gold" href={project.demo} target="_blank" rel="noopener noreferrer">{t.case.open} <span>↗</span></a>}
+        {project.github && <a class="button button-ghost" href={project.github} target="_blank" rel="noopener noreferrer">{t.case.source} <span>↗</span></a>}
+      </div>
+    )}
+
+    {project.demo ? (
+      <div class="case-demo" data-anim>
+        <div class="demo-frame">
+          <div class="demo-bar"><i></i><i></i><i></i><span>{demoHost}</span><a href={project.demo} target="_blank" rel="noopener noreferrer">{t.case.demoOpen}</a></div>
+          <iframe src={project.demo} title={t.case.demoTitle(project.title)} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+        {demoNote && <p class="demo-note">{demoNote}</p>}
+      </div>
+    ) : video ? (
+      <figure class="case-video" data-anim>
+        <video controls preload="none" playsinline poster={video.poster && hasPublic(video.poster) ? video.poster : undefined} aria-label={`${project.title}: ${cs.video.label}`}>
+          <source src={video.src} type={videoMime} />
+        </video>
+        <figcaption>{video.caption ? video.caption[lang] : cs.video.note}</figcaption>
+      </figure>
+    ) : (
+      <CaseVisual slug={project.slug} endpoints={endpoints} />
+    )}
+
+    <div class="case-meta">
+      <div><span>{t.case.meta.type}</span><b>{c.metaType}</b></div>
+      <div><span>{t.case.meta.role}</span><b>{c.role}</b></div>
+      <div><span>{t.case.meta.stack}</span><b>{project.stack}</b></div>
+    </div>
+
+    <section class="case-section">
+      <p class="eyebrow">{c.problem.label}</p>
+      <div><h2>{c.problem.heading} <em>{c.problem.accent}</em></h2><p>{c.problem.text}</p></div>
+    </section>
+
+    <section class="case-section">
+      <p class="eyebrow">{c.features.label}</p>
+      <div>
+        <h2>{c.features.heading}<br /><em>{c.features.accent}</em></h2>
+        <div class="case-feature-grid">
+          {c.features.items.map((f, i) => (
+            <article><span>{String(i + 1).padStart(2, '0')}</span><h3>{f.title}</h3><p>{f.text}</p></article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {screenshots.length > 0 && (
+      <section class="case-section">
+        <p class="eyebrow">{cs.screenshots.label}</p>
+        <div>
+          <h2>{cs.screenshots.heading} <em>{cs.screenshots.accent}</em></h2>
+          <div class="shot-grid">
+            {screenshots.map((s) => {
+              const size = webpSize(s.src);
+              const portrait = size ? size.height > size.width : false;
+              return (
+              <figure class={portrait ? 'is-portrait' : size && size.width / size.height >= 1.2 ? 'is-wide' : undefined}>
+                <a href={s.src} target="_blank" rel="noopener noreferrer"><img src={s.src} alt={s.alt ? s.alt[lang] : project.title} width={size?.width} height={size?.height} loading="lazy" decoding="async" /></a>
+                {s.caption && <figcaption>{s.caption[lang]}</figcaption>}
+              </figure>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {erd && (
+      <section class="case-section">
+        <p class="eyebrow">{cs.erd.label}</p>
+        <div>
+          <h2>{cs.erd.heading} <em>{cs.erd.accent}</em></h2>
+          <figure class="erd-fig"><a href={erd.src} target="_blank" rel="noopener noreferrer"><img src={erd.src} alt={erd.alt ? erd.alt[lang] : project.title} loading="lazy" decoding="async" /></a></figure>
+        </div>
+      </section>
+    )}
+
+    {endpoints.length > 0 && (
+      <section class="case-section">
+        <p class="eyebrow">{cs.endpoints.label}</p>
+        <div>
+          <h2>{cs.endpoints.heading} <em>{cs.endpoints.accent}</em></h2>
+          <div class="table-wrap">
+            <table class="endpoints">
+              <thead><tr><th>{cs.table.method}</th><th>{cs.table.path}</th><th>{cs.table.access}</th><th>{cs.table.note}</th></tr></thead>
+              <tbody>
+                {endpoints.map((e) => (
+                  <tr>
+                    <td><span class={`method m-${e.method.toLowerCase()}`}>{e.method}</span></td>
+                    <td><code>{e.path}</code></td>
+                    <td>{e.access === 'admin' ? cs.table.admin : e.access === 'auth' ? cs.table.auth : cs.table.public}</td>
+                    <td>{e.note ? e.note[lang] : ''}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {explorerHtml && (
+      <section class="case-section">
+        <p class="eyebrow">{cs.explorer.label}</p>
+        <div>
+          <h2>{cs.explorer.heading} <em>{cs.explorer.accent}</em></h2>
+          <p class="xp-note">{cs.explorer.note(explorerCount, explorerDate)}</p>
+          <Fragment set:html={explorerHtml} />
+        </div>
+      </section>
+    )}
+
+    {decisions.length > 0 && (
+      <section class="case-section">
+        <p class="eyebrow">{cs.decisions.label}</p>
+        <div>
+          <h2>{cs.decisions.heading} <em>{cs.decisions.accent}</em></h2>
+          <div class="decision-list">
+            {decisions.map((d, i) => (
+              <article><span>{String(i + 1).padStart(2, '0')}</span><div><h3>{d.title[lang]}</h3><p>{d.text[lang]}</p></div></article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section class="case-section">
+      <p class="eyebrow">{c.learned.label}</p>
+      <div>
+        <h2>{c.learned.heading} <em>{c.learned.accent}</em></h2>
+        <p>{c.learned.text}</p>
+      </div>
+    </section>
+
+    <div class="case-bottom">
+      <a class="button button-gold" href={`${home}#contact`}>{t.case.discuss} <span>↗</span></a>
+      <a class="text-link" href={`${pre}/projects/${next.slug}`}>{t.case.next}: {next.title.toUpperCase()} ↗</a>
+    </div>
+  </main>
+</Base>

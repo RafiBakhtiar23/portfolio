@@ -1,0 +1,30 @@
+# Headers for Cloudflare Pages / Netlify. Security (v9) + cache rules.
+# {{EARLY_HASH}} is replaced at build time (see astro.config.mjs) with the hash of the one inline script.
+# When demos are embedded later (v16), add their domains to frame-src below.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' {{EARLY_HASH}} https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), interest-cohort=()
+
+# Hashed build files never change, so they can be cached for a year.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=2592000
+/*.png
+  Cache-Control: public, max-age=2592000
+/*.svg
+  Cache-Control: public, max-age=2592000
+/cv/*
+  Cache-Control: public, max-age=3600
+/cv/*.pdf
+  # The PDF is shown in an iframe on /cv. The page-level CSP (object-src 'none') can stop a browser's PDF viewer, so the PDF gets only a frame-ancestors rule.
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors 'self'
+/.well-known/*
+  Cache-Control: public, max-age=86400

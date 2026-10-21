@@ -1,0 +1,210 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import '../styles/global.css';
+import '../styles/motion.css';
+import '../styles/sections.css';
+import '../styles/perf.css';
+import '../styles/hero.css';
+import '../styles/topbar.css';
+import '../styles/skills.css';
+import '../styles/about.css';
+import '../styles/education.css';
+import '../styles/contact.css';
+import '../styles/cases.css';
+import '../styles/polish.css';
+import '@fontsource/dm-mono/400.css';
+import '@fontsource/dm-mono/500.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/600.css';
+import '@fontsource/dm-sans/700.css';
+import '@fontsource/playfair-display/500.css';
+import '@fontsource/playfair-display/600.css';
+import '@fontsource/playfair-display/700.css';
+import '@fontsource/playfair-display/500-italic.css';
+import '@fontsource/playfair-display/600-italic.css';
+import { site, sections, ui } from '../data/site.js';
+import { cv } from '../lib/cv.js';
+import { langs, langHome, stripLang } from '../lib/i18n.js';
+import { EARLY_SCRIPT } from '../lib/early-script.js';
+
+const { title, description, home = false, lang = 'en', jsonLd = null, noindex = false } = Astro.props;
+const t = ui[lang];
+const homeHref = langHome(lang);
+const hashBase = home ? '' : homeHref;
+const navItems = sections.filter((s) => s.nav);
+const basePath = stripLang(Astro.url.pathname);
+const hrefFor = (code) => (code === 'id' ? '/id' + basePath : basePath);
+const abs = (p) => (Astro.site ? new URL(p, Astro.site).href : undefined);
+const canonical = noindex ? undefined : abs(hrefFor(lang));
+const hasOg = fs.existsSync(path.join(process.cwd(), 'public', 'og.png'));
+const ogImage = hasOg ? abs('/og.png') : undefined;
+const year = new Date().getFullYear();
+const skipTarget = home ? '#hero' : '#main';
+const beacon = site.analyticsToken ? JSON.stringify({ token: site.analyticsToken }) : '';
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#090909" />
+    <meta name="color-scheme" content="dark" />
+    {site.googleVerification && <meta name="google-site-verification" content={site.googleVerification} />}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.fullName} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content={lang === 'id' ? 'id_ID' : 'en_US'} />
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:width" content="1200" />}
+    {ogImage && <meta property="og:image:height" content="630" />}
+    {ogImage && <meta property="og:image:alt" content={`${site.fullName}, ${site.role}`} />}
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {canonical && <link rel="alternate" hreflang="en" href={abs(hrefFor('en'))} />}
+    {canonical && <link rel="alternate" hreflang="id" href={abs(hrefFor('id'))} />}
+    {canonical && <link rel="alternate" hreflang="x-default" href={abs(hrefFor('en'))} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script is:inline set:html={EARLY_SCRIPT}></script>
+  </head>
+  <body data-copied={t.contact.copied}>
+    <a class="skip-link" href={skipTarget}>{t.skip}</a>
+    {home && (
+      <div class="loader" id="loader" aria-hidden="true">
+        <div class="loader-inner">
+          <p>GET / HTTP/1.1</p>
+          <div class="loader-count">000</div>
+          <div class="loader-bar"><i></i></div>
+          <p class="loader-status">CONNECTING</p>
+          <p class="loader-skip">CLICK OR PRESS ENTER TO SKIP</p>
+        </div>
+      </div>
+    )}
+    <div class="grain" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="wordmark" href={`${homeHref}#top`} aria-label={`${site.name}`}><span class="mark">R.</span><span>{site.name.toUpperCase()}<br /><small>{site.role.toUpperCase()}</small></span></a>
+      <nav id="site-menu" aria-label="Main navigation">
+        {navItems.map((s, i) => <a href={`${hashBase}#${s.id}`} style={`--i:${i}`}>{t.nav[s.id]}</a>)}
+        {cv.exists && <a class="menu-cv button button-gold" href={cv.url} download style={`--i:${navItems.length}`}>{t.downloadCv} <span>↓</span></a>}
+        <a class="menu-mail" href={`mailto:${site.email}`} style={`--i:${navItems.length + 1}`}>{site.email}</a>
+      </nav>
+      <div class="topbar-right">
+        <a class="availability" href={`${hashBase}#contact`}><span class="status-dot"></span> {t.available}</a>
+        <div class="lang-switch" role="group" aria-label={t.langLabel}>
+          {Object.values(langs).map((l) => (
+            <a href={hrefFor(l.code)} hreflang={l.code} lang={l.code} aria-current={l.code === lang ? 'true' : undefined} class={l.code === lang ? 'on' : ''}>{l.label}</a>
+          ))}
+        </div>
+        {cv.exists && <a class="button button-gold button-sm" href={cv.url} download data-magnetic>{t.cv} <span>↓</span></a>}
+        <button type="button" class="menu-btn" id="menu-btn" aria-controls="site-menu" aria-expanded="false" aria-label={t.menu} data-open={t.menu} data-close={t.menuClose}><span></span><span></span></button>
+      </div>
+    </header>
+
+    {home && (
+      <nav class="rail" aria-hidden="true">
+        <span class="rail-line"><i></i></span>
+        {sections.map((s) => <a href={`#${s.id}`} tabindex="-1"><span>{t.nav[s.id]}</span><b></b></a>)}
+      </nav>
+    )}
+
+    <slot />
+
+    <footer class="footer">
+      <a class="footer-logo" href={`${homeHref}#top`}>R.</a>
+      <span>{site.location.toUpperCase()} · {site.workModes.join(' / ').toUpperCase()}</span>
+      <span>© {year} {site.name.toUpperCase()}</span>
+      <button type="button" class="fx-toggle" id="fx-toggle" aria-pressed="false">{t.fx}</button>
+    </footer>
+
+    {lang === 'en' && (
+      <div class="lang-hint" id="lang-hint" hidden>
+        <span>{ui.id.langHint.text}</span>
+        <a href={hrefFor('id')} hreflang="id" lang="id">{ui.id.langHint.yes}</a>
+        <button type="button" id="lang-hint-close" lang="id">{ui.id.langHint.no}</button>
+      </div>
+    )}
+
+    {beacon && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={beacon}></script>}
+
+    <script>
+      import '../scripts/motion.js';
+      import '../scripts/ribbon.js';
+
+      document.querySelectorAll('[data-copy]').forEach((b) => {
+        b.addEventListener('click', async () => {
+          const value = b.getAttribute('data-copy') || '';
+          const label = b.textContent;
+          try {
+            await navigator.clipboard.writeText(value);
+            b.textContent = document.body.dataset.copied || 'COPIED';
+            setTimeout(() => { b.textContent = label; }, 1600);
+          } catch (e) {
+            window.location.href = 'mailto:' + value;
+          }
+        });
+      });
+
+      const menuBtn = document.getElementById('menu-btn');
+      if (menuBtn) {
+        const html = document.documentElement;
+        const setMenu = (open) => {
+          html.classList.toggle('menu-open', open);
+          menuBtn.setAttribute('aria-expanded', String(open));
+          menuBtn.setAttribute('aria-label', open ? menuBtn.dataset.close : menuBtn.dataset.open);
+        };
+        menuBtn.addEventListener('click', () => setMenu(!html.classList.contains('menu-open')));
+        document.querySelectorAll('#site-menu a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+        addEventListener('keydown', (e) => {
+          if (!html.classList.contains('menu-open')) return;
+          if (e.key === 'Escape') { setMenu(false); menuBtn.focus(); return; }
+          if (e.key !== 'Tab') return;
+          // keep keyboard focus inside the open menu (links, language switch, menu button)
+          const items = [...document.querySelectorAll('.topbar a[href], .topbar button')].filter((el) => el.offsetParent !== null);
+          if (!items.length) return;
+          const first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+        matchMedia('(min-width: 1001px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+      }
+
+      // "Reduce effects": one switch that turns off animation, custom cursor and the gold canvas. Remembered on this device.
+      const fx = document.getElementById('fx-toggle');
+      if (fx) {
+        let off = false;
+        try { off = localStorage.getItem('rb-fx') === 'off'; } catch (e) {}
+        fx.setAttribute('aria-pressed', String(off));
+        fx.addEventListener('click', () => {
+          try { if (off) localStorage.removeItem('rb-fx'); else localStorage.setItem('rb-fx', 'off'); } catch (e) {}
+          location.reload();
+        });
+      }
+
+      const hint = document.getElementById('lang-hint');
+      if (hint) {
+        let dismissed = false;
+        try { dismissed = localStorage.getItem('rb-lang-hint') === '1'; } catch (e) {}
+        if (!dismissed && (navigator.language || '').toLowerCase().startsWith('id')) hint.hidden = false;
+        const close = () => {
+          hint.hidden = true;
+          try { localStorage.setItem('rb-lang-hint', '1'); } catch (e) {}
+        };
+        const closeBtn = document.getElementById('lang-hint-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        const yes = hint.querySelector('a');
+        if (yes) yes.addEventListener('click', close);
+      }
+    </script>
+  </body>
+</html>

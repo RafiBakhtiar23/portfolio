@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, ui } from '../data/site.js';
+import { cv } from '../lib/cv.js';
+import { langHome } from '../lib/i18n.js';
+
+const { lang = 'en' } = Astro.props;
+const t = ui[lang];
+const p = t.cvPage;
+---
+<Base title={p.title} description={p.description} lang={lang} noindex={!cv.exists}>
+  <main class="section-shell cvpage" id="main" tabindex="-1">
+    <p class="eyebrow"><span class="eyebrow-line"></span> {p.eyebrow}</p>
+    <h1>{p.h1.main} <em>{p.h1.accent}</em></h1>
+    {cv.exists ? (
+      <>
+        <p class="cvpage-lead">{p.lead}</p>
+        <div class="cvpage-actions">
+          <a class="button button-gold" href={cv.url} download>{p.download} <span>↓</span></a>
+          <a class="button button-ghost" href={cv.url} target="_blank" rel="noopener noreferrer">{p.open} <span>↗</span></a>
+          <a class="text-link" href={langHome(lang)}>{p.back}</a>
+        </div>
+        <iframe class="cvpage-frame" src={`${cv.url}#view=FitH`} title={`${site.fullName}: CV`} loading="lazy"></iframe>
+      </>
+    ) : (
+      <>
+        <p class="cvpage-lead">{p.missing}</p>
+        <div class="cvpage-actions">
+          <a class="button button-gold" href={`${langHome(lang)}#contact`}>{p.contact} <span>↗</span></a>
+          <a class="text-link" href={langHome(lang)}>{p.back}</a>
+        </div>
+      </>
+    )}
+  </main>
+</Base>

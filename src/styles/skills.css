@@ -1,0 +1,87 @@
+/* Skills (v7). Loaded last. Same data and the same three honest levels as before;
+   the cards now sit on an even grid, level is shown by border + marker, and the small notes are readable. */
+
+/* ---------- legend ---------- */
+.legend { gap: 12px 30px; margin: 0 0 34px; font: 11px var(--mono); letter-spacing: .08em; color: #a39e94; }
+.legend span { gap: 10px; }
+.legend i { position: relative; width: 16px; height: 16px; }
+.legend .l-project i::after, .legend .l-working i::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  transform: rotate(45deg);
+}
+.legend .l-project i::after { background: var(--gold); }
+.legend .l-working i::after { border: 1px solid #8a8272; }
+.legend b { margin-left: 2px; padding: 1px 7px; font: 500 10px var(--mono); color: var(--gold); border: 1px solid rgba(198, 168, 117, .3); border-radius: 99px; }
+
+/* ---------- tiers ---------- */
+.tiers { border-top: 1px solid rgba(198, 168, 117, .45); }
+.tier { grid-template-columns: minmax(0, .62fr) minmax(0, 1.38fr); gap: clamp(20px, 4vw, 56px); padding: 40px 0; }
+.tier-head h3 { font-size: clamp(24px, 2.2vw, 30px); }
+.tier-head p { font-size: 13px; color: #a39e94; max-width: 28ch; }
+
+/* ---------- cards: equal size, rows line up ---------- */
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; align-content: start; }
+.chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 76px;
+  padding: 14px 16px 15px;
+  overflow: hidden;
+}
+.chip b { font: 500 14.5px/1.25 var(--sans); padding-right: 16px; }
+.chip small { margin: 0; max-width: none; font: 11px/1.6 var(--mono); letter-spacing: .02em; color: #a0987f; }
+.chip.is-project b { color: #f1e6cb; }
+.chip.is-basic b { color: #c4bca9; }
+/* long notes (Java, Docker) get the whole row so they are never squeezed */
+.chip.has-note { grid-column: 1 / -1; min-height: 0; }
+
+/* level marker, top right */
+.chip::after {
+  content: '';
+  position: absolute;
+  top: 15px; right: 14px;
+  width: 6px; height: 6px;
+  transform: rotate(45deg);
+}
+.chip.is-project::after { background: var(--gold); box-shadow: 0 0 10px rgba(198, 168, 117, .55); }
+.chip.is-working::after { border: 1px solid #766f60; }
+.chip.is-basic::after { display: none; }
+
+/* gold line grows along the bottom on hover */
+.chip::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-bright), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .6s var(--ease);
+}
+.chip:hover::before { transform: scaleX(1); }
+
+/* cards rise in one after another when the group appears */
+.motion-on .tier.is-in .chip { animation: chip-in .7s var(--ease) both; animation-delay: calc(var(--n, 0) * 45ms + 150ms); }
+@keyframes chip-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ---------- smaller screens ---------- */
+@media (max-width: 900px) {
+  .tier { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 32px 0; }
+  .tier-head p { max-width: 46ch; }
+}
+@media (max-width: 560px) {
+  .chips { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .chip { min-height: 70px; padding: 12px 13px 13px; }
+  .chip b { font-size: 14px; }
+  .legend { gap: 10px 18px; font-size: 10.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-on .tier.is-in .chip { animation: none; }
+}

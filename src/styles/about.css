@@ -1,0 +1,102 @@
+/* About (v8). Loaded last. Full-bleed photo (public/about-bg.webp) with the text on the dark left side.
+   Hierarchy: kicker + eyebrow row, big serif heading, gold rule, serif lead, then the supporting paragraphs.
+   The photo keeps its own proportions (no zoom) and fades into the page colour if the section is taller than it. */
+
+.about-cinema {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 46vw;
+  padding-top: clamp(84px, 7vw, 104px);
+  padding-bottom: clamp(70px, 6vw, 90px);
+}
+
+/* background photo */
+.about-bg { position: absolute; z-index: -1; top: 0; left: 0; right: 0; aspect-ratio: 1665 / 856; background: var(--bg); }
+.about-bg img { display: block; width: 100%; height: 100%; }
+.about-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(9, 9, 9, .7) 0%, rgba(9, 9, 9, .4) 34%, rgba(9, 9, 9, 0) 56%),
+    linear-gradient(180deg, var(--bg) 0%, rgba(9, 9, 9, 0) 14%, rgba(9, 9, 9, 0) 74%, var(--bg) 100%);
+}
+
+/* kicker + eyebrow on one row */
+.about-head { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 0; }
+.about-head .section-kicker { width: clamp(150px, 28vw, 440px); }
+.about-head .eyebrow { margin: 0; }
+
+.about-body { max-width: 31vw; margin-top: clamp(28px, 3.4vw, 46px); }
+.about-body h2 {
+  width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  font: 500 clamp(42px, 4.6vw, 66px)/1.07 var(--serif);
+  letter-spacing: -.055em;
+  margin: 0 0 clamp(26px, 3vw, 36px);
+}
+
+/* lead statement */
+.manifesto-bottom { display: block; }
+.manifesto-bottom::before {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 1px;
+  margin-bottom: 24px;
+  background: var(--gold);
+}
+.manifesto-bottom p {
+  max-width: none;
+  margin: 0;
+  font: 400 clamp(19px, 1.65vw, 25px)/1.45 var(--serif);
+  letter-spacing: -.015em;
+  color: #ddd5c4;
+}
+/* words not yet read are dim but still legible */
+.motion-on .w { color: #625d52; }
+.motion-on .w.lit { color: #e6dec9; }
+
+/* supporting paragraphs */
+.about-more {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-top: clamp(24px, 3vw, 34px);
+  padding-top: clamp(20px, 2.2vw, 26px);
+  border-top: 1px solid var(--line);
+}
+.about-more p { max-width: none; margin: 0; font-size: 13px; line-height: 1.9; color: #b3ada2; }
+
+/* tablet / phone: photo on top, text underneath (the text would sit on the person otherwise) */
+@media (max-width: 1100px) {
+  .about-cinema { min-height: 0; padding-top: 0; padding-bottom: 96px; }
+  .about-bg {
+    position: relative;
+    z-index: auto;
+    margin: 0 -6%;
+    aspect-ratio: auto;
+    height: clamp(300px, 84vw, 560px);
+  }
+  .about-bg img { object-fit: cover; object-position: 100% 50%; }
+  .about-bg::after {
+    background:
+      linear-gradient(180deg, var(--bg) 0%, rgba(9, 9, 9, 0) 14%, rgba(9, 9, 9, 0) 62%, rgba(9, 9, 9, .85) 88%, var(--bg) 100%);
+  }
+  .about-head,
+  .about-body { position: relative; z-index: 1; }
+  .about-head {
+    justify-content: space-between;
+    margin-top: clamp(-52px, -10vw, -36px);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .about-head .section-kicker { width: auto; }
+  .about-body { max-width: 640px; margin-top: 26px; }
+  .about-body h2 { width: auto; white-space: normal; font-size: clamp(34px, 9vw, 56px); }
+  .manifesto-bottom p { font-size: clamp(20px, 3.2vw, 26px); }
+}

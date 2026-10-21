@@ -1,0 +1,346 @@
+{
+  "capturedAt": "2026-10-20",
+  "baseUrl": "http://localhost:8080",
+  "steps": [
+    {
+      "title": {
+        "en": "Check that the server is up",
+        "id": "Memeriksa server berjalan"
+      },
+      "method": "GET",
+      "path": "/health",
+      "requestHeaders": {},
+      "requestBody": null,
+      "status": 200,
+      "responseBody": {
+        "status": "ok"
+      }
+    },
+    {
+      "title": {
+        "en": "Create an account",
+        "id": "Membuat akun"
+      },
+      "method": "POST",
+      "path": "/api/auth/register",
+      "requestHeaders": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": {
+        "name": "Rafi",
+        "email": "rafi.demo@example.com",
+        "password": "rahasia123"
+      },
+      "status": 201,
+      "responseBody": {
+        "data": {
+          "id": 1,
+          "name": "Rafi",
+          "email": "rafi.demo@example.com",
+          "created_at": "2026-10-20T15:38:56.913128552+07:00"
+        },
+        "message": "registrasi berhasil"
+      }
+    },
+    {
+      "title": {
+        "en": "Same email again is rejected",
+        "id": "Email yang sama ditolak"
+      },
+      "method": "POST",
+      "path": "/api/auth/register",
+      "requestHeaders": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": {
+        "name": "Rafi",
+        "email": "rafi.demo@example.com",
+        "password": "rahasia123"
+      },
+      "status": 409,
+      "responseBody": {
+        "error": "email sudah terdaftar"
+      }
+    },
+    {
+      "title": {
+        "en": "Invalid input is rejected",
+        "id": "Input tidak valid ditolak"
+      },
+      "method": "POST",
+      "path": "/api/auth/register",
+      "requestHeaders": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": {
+        "name": "Rafi",
+        "email": "not-an-email",
+        "password": "123"
+      },
+      "status": 400,
+      "responseBody": {
+        "error": "Key: 'registerInput.Email' Error:Field validation for 'Email' failed on the 'email' tag\nKey: 'registerInput.Password' Error:Field validation for 'Password' failed on the 'min' tag"
+      }
+    },
+    {
+      "title": {
+        "en": "Log in and receive a JWT",
+        "id": "Login dan menerima JWT"
+      },
+      "method": "POST",
+      "path": "/api/auth/login",
+      "requestHeaders": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": {
+        "email": "rafi.demo@example.com",
+        "password": "rahasia123"
+      },
+      "status": 200,
+      "responseBody": {
+        "expires_in": 86400,
+        "token": "eyJhbGciOiJIUzI1Ni…",
+        "token_type": "Bearer"
+      }
+    },
+    {
+      "title": {
+        "en": "A wrong password gives 401",
+        "id": "Password salah menghasilkan 401"
+      },
+      "method": "POST",
+      "path": "/api/auth/login",
+      "requestHeaders": {
+        "Content-Type": "application/json"
+      },
+      "requestBody": {
+        "email": "rafi.demo@example.com",
+        "password": "salah-total"
+      },
+      "status": 401,
+      "responseBody": {
+        "error": "email atau password salah"
+      }
+    },
+    {
+      "title": {
+        "en": "Profile of the logged-in user",
+        "id": "Profil pengguna yang login"
+      },
+      "method": "GET",
+      "path": "/api/me",
+      "requestHeaders": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": null,
+      "status": 200,
+      "responseBody": {
+        "data": {
+          "id": 1,
+          "name": "Rafi",
+          "email": "rafi.demo@example.com",
+          "created_at": "2026-10-20T15:38:56.913128552+07:00"
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "No token, no access",
+        "id": "Tanpa token, tidak ada akses"
+      },
+      "method": "GET",
+      "path": "/api/tasks",
+      "requestHeaders": {},
+      "requestBody": null,
+      "status": 401,
+      "responseBody": {
+        "error": "token tidak ditemukan"
+      }
+    },
+    {
+      "title": {
+        "en": "Create a task",
+        "id": "Membuat task"
+      },
+      "method": "POST",
+      "path": "/api/tasks",
+      "requestHeaders": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": {
+        "title": "Belajar goroutine",
+        "description": "Baca dokumentasi dan buat contoh"
+      },
+      "status": 201,
+      "responseBody": {
+        "data": {
+          "id": 1,
+          "user_id": 1,
+          "title": "Belajar goroutine",
+          "description": "Baca dokumentasi dan buat contoh",
+          "done": false,
+          "created_at": "2026-10-20T15:38:57.067602292+07:00",
+          "updated_at": "2026-10-20T15:38:57.067602292+07:00"
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "Create a second task",
+        "id": "Membuat task kedua"
+      },
+      "method": "POST",
+      "path": "/api/tasks",
+      "requestHeaders": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": {
+        "title": "Menulis tes untuk handler"
+      },
+      "status": 201,
+      "responseBody": {
+        "data": {
+          "id": 2,
+          "user_id": 1,
+          "title": "Menulis tes untuk handler",
+          "description": "",
+          "done": false,
+          "created_at": "2026-10-20T15:38:57.112172832+07:00",
+          "updated_at": "2026-10-20T15:38:57.112172832+07:00"
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "List tasks with pagination",
+        "id": "Daftar task dengan pagination"
+      },
+      "method": "GET",
+      "path": "/api/tasks?page=1&limit=10",
+      "requestHeaders": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": null,
+      "status": 200,
+      "responseBody": {
+        "data": [
+          {
+            "id": 2,
+            "user_id": 1,
+            "title": "Menulis tes untuk handler",
+            "description": "",
+            "done": false,
+            "created_at": "2026-10-20T15:38:57.112172832+07:00",
+            "updated_at": "2026-10-20T15:38:57.112172832+07:00"
+          },
+          {
+            "id": 1,
+            "user_id": 1,
+            "title": "Belajar goroutine",
+            "description": "Baca dokumentasi dan buat contoh",
+            "done": false,
+            "created_at": "2026-10-20T15:38:57.067602292+07:00",
+            "updated_at": "2026-10-20T15:38:57.067602292+07:00"
+          }
+        ],
+        "meta": {
+          "limit": 10,
+          "page": 1,
+          "total": 2
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "Update only one field",
+        "id": "Mengubah satu field saja"
+      },
+      "method": "PUT",
+      "path": "/api/tasks/1",
+      "requestHeaders": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": {
+        "done": true
+      },
+      "status": 200,
+      "responseBody": {
+        "data": {
+          "id": 1,
+          "user_id": 1,
+          "title": "Belajar goroutine",
+          "description": "Baca dokumentasi dan buat contoh",
+          "done": true,
+          "created_at": "2026-10-20T15:38:57.067602292+07:00",
+          "updated_at": "2026-10-20T15:38:57.133681456+07:00"
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "Filter by done",
+        "id": "Filter berdasarkan done"
+      },
+      "method": "GET",
+      "path": "/api/tasks?done=true",
+      "requestHeaders": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": null,
+      "status": 200,
+      "responseBody": {
+        "data": [
+          {
+            "id": 1,
+            "user_id": 1,
+            "title": "Belajar goroutine",
+            "description": "Baca dokumentasi dan buat contoh",
+            "done": true,
+            "created_at": "2026-10-20T15:38:57.067602292+07:00",
+            "updated_at": "2026-10-20T15:38:57.133681456+07:00"
+          }
+        ],
+        "meta": {
+          "limit": 10,
+          "page": 1,
+          "total": 1
+        }
+      }
+    },
+    {
+      "title": {
+        "en": "A task that does not exist",
+        "id": "Task yang tidak ada"
+      },
+      "method": "GET",
+      "path": "/api/tasks/9999",
+      "requestHeaders": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": null,
+      "status": 404,
+      "responseBody": {
+        "error": "task tidak ditemukan"
+      }
+    },
+    {
+      "title": {
+        "en": "Delete a task",
+        "id": "Menghapus task"
+      },
+      "method": "DELETE",
+      "path": "/api/tasks/2",
+      "requestHeaders": {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1Ni…"
+      },
+      "requestBody": null,
+      "status": 200,
+      "responseBody": {
+        "message": "task dihapus"
+      }
+    }
+  ]
+}

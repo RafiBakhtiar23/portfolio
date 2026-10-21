@@ -1,0 +1,79 @@
+/* Contact (v7). Loaded last. The big "200 OK" stays (it is the site's signature joke) but no longer sits
+   on top of the email and the button: on desktop it lives in the free right half, on phones it closes the section. */
+
+.contact { padding-top: clamp(80px, 9vw, 125px); padding-bottom: 38px; }
+
+/* ---------- copy ---------- */
+.contact-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  max-width: 34rem;
+}
+.contact-bottom p { max-width: 34em; font-size: clamp(14px, .5vw + 8px, 16px); line-height: 1.85; color: #b4aea3; }
+.contact .button-gold { min-height: 54px; padding: 0 26px; gap: 28px; letter-spacing: .1em; }
+
+/* email as a small plate: address + copy button read as one control */
+.contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
+  margin-top: clamp(30px, 4vw, 44px);
+  padding: 12px 12px 12px clamp(16px, 2vw, 24px);
+  border: 1px solid rgba(198, 168, 117, .35);
+  background: rgba(9, 9, 9, .55);
+}
+.contact-email a { font-size: clamp(18px, 2.4vw, 30px); border-bottom: 0; padding-bottom: 0; }
+.contact-email a:hover { color: var(--gold-bright); }
+.copy-btn { min-height: 40px; padding: 0 14px; border-color: rgba(198, 168, 117, .5); flex: none; }
+
+/* ---------- links ---------- */
+.contact .contact-links { margin-top: clamp(56px, 7vw, 90px); gap: 6px 30px; }
+.contact-links a { padding: 8px 0; border-bottom: 1px solid transparent; transition: color .25s, border-color .25s; }
+.contact-links a:hover { color: var(--gold-bright); border-color: rgba(198, 168, 117, .5); }
+
+/* ---------- 200 OK: free right half on desktop ---------- */
+@media (min-width: 901px) {
+  .contact > .status-big {
+    right: 4%;
+    top: 48%;
+    bottom: auto;
+    translate: 0 -50%;
+    font-size: clamp(110px, 14.5vw, 250px);
+  }
+  .status-big small { margin-top: 20px; }
+}
+
+/* ---------- phones & tablets: in the flow, closing the section ---------- */
+@media (max-width: 900px) {
+  .contact { display: flex; flex-direction: column; }
+  .contact > .status-big {
+    position: relative;
+    order: 99;
+    right: auto; bottom: auto;
+    margin-top: 44px;
+    align-self: flex-end;
+    font-size: clamp(96px, 30vw, 220px);
+    opacity: 1;
+  }
+  .contact > .contact-email { align-self: flex-start; }
+}
+@media (max-width: 700px) {
+  .contact-email { gap: 10px; padding-left: 14px; }
+  .contact-email a { font-size: clamp(16px, 5vw, 22px); }
+  .contact .button-gold { width: 100%; }
+  .contact-links { gap: 4px 22px; }
+  .contact-links a { padding: 11px 0; }
+}
+
+/* ---------- footer ---------- */
+.footer { position: relative; border-top: 0; }
+.footer::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(198, 168, 117, .35) 20%, rgba(198, 168, 117, .35) 80%, transparent);
+}

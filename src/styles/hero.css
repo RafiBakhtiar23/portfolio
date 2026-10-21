@@ -1,0 +1,172 @@
+/* Hero (intro) — v7.
+   One full-bleed animated gold background (src/scripts/ribbon.js draws it into .hero-bg) behind the intro text.
+   Loaded last (after perf.css) so it replaces the older hero rules in global.css / perf.css. */
+
+:root {
+  --gold-text: linear-gradient(100deg, #b4935a 0%, #ecd3a0 30%, #c6a875 55%, #f3dca6 78%, #b9985f 100%);
+}
+
+/* ---------- section frame ---------- */
+.hero {
+  min-height: clamp(620px, calc(100svh - 88px), 1000px);
+  padding-top: clamp(40px, 7svh, 84px);
+  padding-bottom: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  isolation: isolate;
+}
+
+/* ---------- background ---------- */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  /* static fallback (reduced motion / low-end devices / before the canvas starts) */
+  background:
+    radial-gradient(ellipse 60% 70% at 74% 48%, rgba(198, 168, 117, .12), transparent 70%),
+    url('/hero-lines.webp') 78% 50% / cover no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, .25), #000 62%);
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, .25), #000 62%);
+}
+.hero-bg.live {
+  background: radial-gradient(ellipse 60% 70% at 74% 48%, rgba(198, 168, 117, .1), transparent 70%);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.hero-bg .ribbon { position: absolute; inset: 0; display: block; }
+/* keep the text readable over the lines */
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(9, 9, 9, .78) 0%, rgba(9, 9, 9, .5) 34%, transparent 62%);
+}
+
+/* ---------- copy ---------- */
+.hero-copy { padding-top: 0; align-self: center; min-width: 0; max-width: min(100%, 46rem); }
+
+.hero h1 {
+  font: 500 clamp(52px, min(8vw, 13.4svh), 136px)/.95 var(--serif);
+  letter-spacing: -.055em;
+  margin: clamp(20px, 3.2svh, 34px) 0 clamp(18px, 3svh, 30px);
+  color: var(--cream);
+}
+/* second line: smaller, italic, gold leaf */
+.hero h1 em {
+  display: inline-block;
+  padding-right: .08em;
+  font-size: .43em;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  color: var(--gold);
+  background: var(--gold-text);
+  background-size: 220% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+/* one sheen across the gold line after it appears */
+.motion-on .hero h1.is-in em { animation: gold-sheen 3.4s var(--ease) .9s 1 both; }
+@keyframes gold-sheen { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+
+.hero-intro {
+  max-width: 54ch;
+  color: #bdb7ab;
+  font-size: clamp(14px, .7vw + 6px, 16px);
+  line-height: 1.8;
+  margin-bottom: 0;
+}
+
+.hero-actions { gap: 14px 26px; margin-top: clamp(24px, 3.6svh, 36px); }
+.hero .button { min-height: 52px; padding: 0 24px; gap: 22px; letter-spacing: .1em; }
+.hero .button-gold {
+  background: linear-gradient(180deg, #ecd3a0 0%, #c6a875 52%, #aa8b58 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 214, .55), 0 14px 34px -14px rgba(198, 168, 117, .55);
+}
+.hero .button-gold:hover { background: linear-gradient(180deg, #f4dfb4 0%, #d3b782 52%, #b9996a 100%); }
+.hero .button-ghost { border-color: rgba(198, 168, 117, .5); background: rgba(9, 9, 9, .35); }
+
+/* ---------- bottom bar: work modes · scroll cue · location ---------- */
+.hero-bottom {
+  grid-column: 1 / -1;
+  margin-top: clamp(28px, 5svh, 56px);
+  padding: 20px 0 24px;
+  border-top: 1px solid var(--line);
+  align-items: center;
+  gap: 12px 24px;
+  letter-spacing: .12em;
+  color: #8d8981;
+}
+.hero-bottom span:first-child { color: var(--gold); }
+.scroll-mark {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 1px;
+  height: 44px;
+  overflow: hidden;
+  background: rgba(198, 168, 117, .28);
+  font-size: 0;
+  animation: none;
+}
+.scroll-mark::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--gold-bright);
+  animation: scroll-drop 2.4s var(--ease) infinite;
+}
+@keyframes scroll-drop { from { transform: translateY(-16px); } to { transform: translateY(44px); } }
+
+/* ---------- ultra-wide ---------- */
+@media (min-width: 1500px) {
+  .hero { min-height: clamp(700px, calc(100svh - 88px), 1000px); }
+}
+
+/* ---------- tablet & phone ---------- */
+@media (max-width: 900px) {
+  .hero { min-height: clamp(560px, calc(100svh - 72px), 900px); padding-top: clamp(36px, 8vw, 64px); }
+  .hero h1 { font-size: clamp(48px, 17vw, 120px); }
+  .hero h1 em { font-size: .42em; }
+  .hero-bg::after { background: linear-gradient(180deg, rgba(9, 9, 9, .7), rgba(9, 9, 9, .38) 60%, rgba(9, 9, 9, .2)); }
+  .hero-bg { -webkit-mask-image: none; mask-image: none; }
+}
+
+@media (max-width: 700px) {
+  .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hero .button { width: 100%; padding: 0 16px; gap: 12px; min-height: 54px; }
+  .hero-actions .text-link { grid-column: 1 / -1; padding: 8px 0; justify-self: start; }
+  .hero-bottom { font-size: 10px; }
+}
+
+@media (max-width: 420px) {
+  .hero h1 { font-size: clamp(46px, 17vw, 76px); }
+}
+
+@media (max-width: 400px) {
+  .hero-bottom { flex-wrap: wrap; letter-spacing: .08em; }
+  .scroll-mark { display: none; }
+}
+
+@media (max-width: 370px) {
+  .hero-actions { grid-template-columns: 1fr; }
+}
+
+/* short landscape screens */
+@media (max-height: 640px) and (min-width: 901px) {
+  .hero { padding-top: 32px; }
+  .hero h1 { font-size: clamp(48px, 7vw, 92px); }
+}
+
+/* ---------- motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-mark::after, .motion-on .hero h1.is-in em { animation: none !important; }
+  .scroll-mark::after { transform: translateY(8px); }
+}

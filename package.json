@@ -1,0 +1,14 @@
+{
+  "name": "rafi-portfolio",
+  "type": "module",
+  "engines": { "node": ">=20.3.0" },
+  "version": "0.9.0",
+  "scripts": {"dev": "astro dev", "build": "astro build", "preview": "astro preview", "check": "node tools/check-content.mjs", "prebuild": "node tools/check-content.mjs"},
+  "dependencies": {
+    "@fontsource/dm-mono": "^5.1.0",
+    "@fontsource/dm-sans": "^5.1.0",
+    "@fontsource/playfair-display": "^5.1.0",
+    "astro": "^5.14.1"
+  },
+  "devDependencies": {}
+}
